@@ -10,6 +10,7 @@ impl TYA {
     // Contoh kode assembly : TYA [98]
     // Artinya : salin data dari register Y ke register A
     pub fn transfer(cpu: &mut Cpu) -> u16 {
+        println!("TYA");
         cpu.a = cpu.y;
         cpu.update_zero_and_negative_flags(cpu.a);
         cpu.cycle += 2;

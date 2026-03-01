@@ -14,6 +14,7 @@ impl CMP {
     // kalau hasilnya 0, kita set flag zero ke 1, kalau positif, kita set flag negatif ke 0 dan flag carry ke 1
     pub fn immediate(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
         let param = bus.read(cpu.pc);
+        println!("CMP #${:x}", param);
         cpu.pc = cpu.pc.wrapping_add(1);
         let result = cpu.a as i16 - param as i16; // konversi ke i16 agar hasil bisa minus
         let result_u8 = result as u8; // buat versi u8 nya untuk cek flag zero dan negative, karena sejatinya

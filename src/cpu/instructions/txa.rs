@@ -10,6 +10,7 @@ impl TXA {
     // Contoh kode assembly : TXA [8a]
     // Artinya : salin nilai dari register x ke register a
     pub fn transfer(cpu: &mut Cpu) -> u16 {
+        println!("TXA");
         cpu.a = cpu.x;
         cpu.update_zero_and_negative_flags(cpu.a);
         cpu.cycle += 2;

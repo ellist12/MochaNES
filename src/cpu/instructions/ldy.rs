@@ -26,6 +26,7 @@ impl LDY {
         // Contoh kode assembly : LDY $05 [A4 05]
         // Artinya : ambil angka di bagian zeropage ram dengan address $05 ($0005), masukan ke register Y
         let param = bus.read(cpu.pc);
+        println!("LDY ${:x}", param);
         cpu.pc = cpu.pc.wrapping_add(1);
         let data = bus.read(param as u16);
         cpu.y = data;
@@ -45,6 +46,7 @@ impl LDY {
         let hi = bus.read(cpu.pc) as u16;
         cpu.pc = cpu.pc.wrapping_add(1);
         let addr = (hi << 8) | lo;
+        println!("LDY ${:x}", addr);
         let data = bus.read(addr);
         cpu.y = data;
         cpu.update_zero_and_negative_flags(cpu.y);
