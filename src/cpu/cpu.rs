@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{bus::Bus, cpu::instructions::{and::AND, beq::BEQ, bne::BNE, bpl::BPL, cld::CLD, cmp::CMP, dec::DEC, dey::DEY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
+use crate::{bus::Bus, cpu::instructions::{and::AND, beq::BEQ, bne::BNE, bpl::BPL, cld::CLD, cmp::CMP, dec::DEC, dey::DEY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
 
 pub struct Cpu {
     // Register Utama
@@ -146,6 +146,9 @@ impl Cpu {
             }
             0xA9 => {
                 LDA::immedeate(self, bus)
+            }
+            0xAA => {
+                TAX::transfer(self)
             }
             0xAC => {
                 LDY::absolute(self, bus)
