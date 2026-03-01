@@ -18,3 +18,4 @@ pub mod bne;
 pub mod txa;
 pub mod tya;
 pub mod cmp;
+pub mod lsr;
