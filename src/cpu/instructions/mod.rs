@@ -21,3 +21,4 @@ pub mod cmp;
 pub mod lsr;
 pub mod tax;
 pub mod clc;
+pub mod adc;
