@@ -99,6 +99,9 @@ impl Cpu {
             0x65 => {
                 ADC::zeropage(self, bus)
             }
+            0x69 => {
+                ADC::immediate(self, bus)
+            }
             0x78 => {
                 SEI::set(self)
             }
