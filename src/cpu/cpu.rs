@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dex::DEX, dey::DEY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
+use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dex::DEX, dey::DEY, iny::INY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
 
 pub struct Cpu {
     // Register Utama
@@ -173,6 +173,9 @@ impl Cpu {
             }
             0xC6 => {
                 DEC::zeropage(self, bus)
+            }
+            0xC8 => {
+                INY::increment(self)
             }
             0xC9 => {
                 CMP::immediate(self, bus)
