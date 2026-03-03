@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dey::DEY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
+use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dex::DEX, dey::DEY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
 
 pub struct Cpu {
     // Register Utama
@@ -150,6 +150,9 @@ impl Cpu {
             0xA5 => {
                 LDA::zeropage(self, bus)
             }
+            0xA6 => {
+                LDX::zeropage(self, bus)
+            }
             0xA9 => {
                 LDA::immedeate(self, bus)
             }
@@ -161,6 +164,9 @@ impl Cpu {
             }
             0xAD => {
                 LDA::absolute(self, bus)
+            }
+            0xCA => {
+                DEX::decrement(self)
             }
             0xC6 => {
                 DEC::zeropage(self, bus)
