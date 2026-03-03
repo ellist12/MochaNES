@@ -97,7 +97,7 @@ impl Cpu {
                 JMP::jump(self, bus)
             }
             0x65 => {
-                ADC::add(self, bus)
+                ADC::zeropage(self, bus)
             }
             0x78 => {
                 SEI::set(self)

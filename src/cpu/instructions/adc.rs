@@ -3,7 +3,7 @@ use crate::{bus::Bus, cpu::cpu::Cpu};
 pub struct ADC;
 
 impl ADC {
-    pub fn add(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
+    pub fn zeropage(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
         let addr = bus.read(cpu.pc);
         cpu.pc = cpu.pc.wrapping_add(1);
         let data = bus.read(addr as u16);

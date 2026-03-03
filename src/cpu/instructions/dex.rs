@@ -10,6 +10,7 @@ impl DEX {
     // Contoh kode assembly : DEX [ca]
     // Artinya : Kurangi nilai di register X sebanyak 1 buah
     pub fn decrement(cpu: &mut Cpu) -> u16 {
+        println!("DEX");
         cpu.x = cpu.x.wrapping_sub(1);
         cpu.update_zero_and_negative_flags(cpu.x);
         cpu.cycle += 2;
