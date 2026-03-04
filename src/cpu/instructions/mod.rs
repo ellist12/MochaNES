@@ -24,3 +24,4 @@ pub mod clc;
 pub mod adc;
 pub mod dex;
 pub mod iny;
+pub mod pla;
