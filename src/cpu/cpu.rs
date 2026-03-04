@@ -168,6 +168,9 @@ impl Cpu {
             0xAD => {
                 LDA::absolute(self, bus)
             }
+            0xB1 => {
+                LDA::indirect_y(self, bus)
+            }
             0xCA => {
                 DEX::decrement(self)
             }

@@ -55,4 +55,34 @@ impl LDA {
         cpu.cycle += 4;
         4
     }
+
+    // LDA Indirect, Y
+    // Ambil 2 byte data ram zeropage di alamat yang ditunjuk di byte berikutnya (ptr dan ptr + 1).
+    // Kedua data itu akan digabung jadi satu alamat baru, lalu tambahkan value register Y ke alamat itu.
+    // Lalu ambil data dari alamat hasil penjumlahan dengan register Y itu, dan masukkan nilainya ke
+    // register A
+    // Ukuran opcode : 2 byte
+    // Jumlah cycle : 5 / 6 jika page cross
+    // Contoh kode assembly : LDA ($00), Y
+    // Artinya :
+    //      1. Ambil 2 byte data dari alamat $00 di dalam bagian zeropage ram ($00 lo dan $01 hi)
+    //      2. Gabung value kedua byte tersebut jadi satu alamat baru (misal : $2001)
+    //      3. Tambahkan alamat baru tersebut dengan value yang ada di register Y (misal : $05, $2001 + $04 = $2004)
+    //      4. Ambil data dari alamat $2004
+    pub fn indirect_y(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
+        let param = bus.read(cpu.pc);
+        cpu.pc = cpu.pc.wrapping_add(1);
+        let data_lo = bus.read(param as u16) as u16;
+        let data_hi = bus.read(param.wrapping_add(1) as u16) as u16;
+        let data_addr = (data_hi << 8) | data_lo;
+        let data_addr_append_y = data_addr + cpu.y as u16;
+        let data = bus.read(data_addr_append_y as u16);
+        cpu.a = data;
+        let mut cycle = 5;
+        if (data_addr & 0xFF00) != (data_addr_append_y & 0xFF00) {
+            cycle += 1;
+        }
+        cpu.update_zero_and_negative_flags(cpu.a);
+        cycle
+    }
 }
