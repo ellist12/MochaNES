@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dex::DEX, dey::DEY, iny::INY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, pla::PLA, rts::RTS, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
+use crate::{bus::Bus, cpu::instructions::{adc::ADC, and::AND, beq::BEQ, bne::BNE, bpl::BPL, brk::BRK, clc::CLC, cld::CLD, cmp::CMP, dec::DEC, dex::DEX, dey::DEY, iny::INY, jmp::JMP, jsr::JSR, lda::LDA, ldx::LDX, ldy::LDY, lsr::LSR, pha::PHA, pla::PLA, rts::RTS, sei::SEI, sta::STA, sty::STY, tax::TAX, txa::TXA, txs::TXS, tya::TYA}, mochanes::Region};
 
 pub struct Cpu {
     // Register Utama
@@ -81,6 +81,9 @@ impl Cpu {
 
         //2. DECODE & EXECUTE: Cek opcodenya apa
         match opcode {
+            0x00 => {
+                BRK::brk(self, bus)
+            }
             0x10 => {
                 BPL::branch(self, bus)
             }
