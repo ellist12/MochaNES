@@ -25,3 +25,4 @@ pub mod adc;
 pub mod dex;
 pub mod iny;
 pub mod pla;
+pub mod rts;
