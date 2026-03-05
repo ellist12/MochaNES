@@ -32,6 +32,7 @@ impl DEC {
         let hi = bus.read(cpu.pc) as u16;
         cpu.pc = cpu.pc.wrapping_add(1);
         let addr = (hi << 8) | lo;
+        println!("DEC ${:x}", addr);
         let data = bus.read(addr);
         let result = data.wrapping_sub(1);
         bus.write(addr, result);
