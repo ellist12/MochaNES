@@ -19,4 +19,23 @@ impl DEC {
         cpu.cycle += 5;
         5
     }
+
+
+    // DEC (Decrement Memory) Zero Page
+    // Ambil nilai di sebuah alamat memory yang di specify di 2 byte berikutnya setelah opcode, menguranginya dengan 1,
+    // menyimpan kembali hasilnya ke alamat tersebut
+    // Ukuran Opcode : 3 byte
+    // Jumlah cycle : 6 cycle
+    pub fn absolute(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
+        let lo = bus.read(cpu.pc) as u16;
+        cpu.pc = cpu.pc.wrapping_add(1);
+        let hi = bus.read(cpu.pc) as u16;
+        cpu.pc = cpu.pc.wrapping_add(1);
+        let addr = (hi << 8) | lo;
+        let data = bus.read(addr);
+        let result = data.wrapping_sub(1);
+        bus.write(addr, result);
+        cpu.update_zero_and_negative_flags(result);
+        6
+    }
 }

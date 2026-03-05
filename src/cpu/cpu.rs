@@ -186,6 +186,9 @@ impl Cpu {
             0xCA => {
                 DEX::decrement(self)
             }
+            0xCE => {
+                DEC::absolute(self, bus)
+            }
             0xC6 => {
                 DEC::zeropage(self, bus)
             }
