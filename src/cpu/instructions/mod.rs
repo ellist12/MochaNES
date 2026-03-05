@@ -27,3 +27,4 @@ pub mod iny;
 pub mod pla;
 pub mod rts;
 pub mod brk;
+pub mod stx;
