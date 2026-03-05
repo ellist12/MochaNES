@@ -17,6 +17,7 @@ impl RTS {
         cpu.sp = cpu.sp.wrapping_add(1);
         let hi = bus.read(0x0100 + cpu.sp as u16) as u16;
         let addr = (hi << 8) | lo;
+        println!("addr from stack : {:x}", addr);
         cpu.pc = addr.wrapping_add(1); // Ditambah satu, karena JSR tidak menyimpan address berikutnya,
                                        // melainkan byte terakhir dari parameter instruki JSR nya
         cpu.cycle += 6;

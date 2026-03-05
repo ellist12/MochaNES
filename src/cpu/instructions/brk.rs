@@ -14,6 +14,7 @@ impl BRK {
     //           status register ke stack, lompat ke vector alamat tujuan dari $FFFE dan $FFFF, lalu isi
     //           PC dengan alamat itu
     pub fn brk(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
+        println!("BRK");
         cpu.pc = cpu.pc.wrapping_add(2);
         let hi = cpu.pc >> 8;
         let lo = cpu.pc & 0xFF;

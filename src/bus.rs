@@ -61,7 +61,7 @@ impl Bus {
     pub fn write(&mut self, addr: u16, val: u8) {
         match addr {
             0x0000..=0x1FFF => { // Internal RAM and mirror
-                // self.ram[addr as usize & 0x07FF]
+                self.ram[addr as usize & 0x07FF] = val;
             },
             0x2000..=0x2007 => { // PPU Register
                 self.ppu.handle_write(addr, val);
