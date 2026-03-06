@@ -129,6 +129,9 @@ impl Cpu {
             0x29 => {
                 AND::immediate(self, bus)
             }
+            0x45 => {
+                EOR::zeropage(self, bus)
+            }
             0x49 => {
                 EOR::immediate(self, bus)
             }
