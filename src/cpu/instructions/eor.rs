@@ -10,6 +10,7 @@ impl EOR {
     // Jumlah cycle  : 2
     pub fn immediate(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
         let param = bus.read(cpu.pc);
+        cpu.pc = cpu.pc.wrapping_add(1);
         println!("EOR #${:x}", param);
         let result = cpu.a ^ param;
         cpu.a = result;
