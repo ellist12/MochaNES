@@ -1,0 +1,20 @@
+use crate::{bus::Bus, cpu::cpu::Cpu};
+
+pub struct EOR;
+
+impl EOR {
+    // EOR immediate
+    // Lakukan operasi XOR (Exclusive OR) antara accumulator (A) dan sebuah nilai immediate.
+    // Hasilnya simpan di register A
+    // Ukuran opcode : 2 byte
+    // Jumlah cycle  : 2
+    pub fn immediate(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
+        let param = bus.read(cpu.pc);
+        println!("EOR #${:x}", param);
+        let result = cpu.a ^ param;
+        cpu.a = result;
+        cpu.update_zero_and_negative_flags(cpu.a);
+        cpu.cycle += 2;
+        2
+    }
+}

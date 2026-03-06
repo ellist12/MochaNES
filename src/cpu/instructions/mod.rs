@@ -29,3 +29,4 @@ pub mod rts;
 pub mod brk;
 pub mod stx;
 pub mod tay;
+pub mod eor;
