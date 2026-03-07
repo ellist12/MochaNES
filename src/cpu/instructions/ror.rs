@@ -12,6 +12,7 @@ impl ROR {
     pub fn zeropage(cpu: &mut Cpu, bus: &mut Bus) -> u16 {
         // baca parameter address zeropage
         let param = bus.read(cpu.pc);
+        println!("ROR {:x}", param);
         cpu.pc = cpu.pc.wrapping_add(1);
 
         // ambil data dari alamat di parameter itu
