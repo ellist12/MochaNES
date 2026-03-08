@@ -9,7 +9,7 @@ pub struct Ppu {
     ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
     v: u16,
     t: u16,
-    x: u16,
+    x: u8,
     w: bool, // write toggle untuk menentukan cpu lagi nulis hi byte atau lo byte
                    // ke ppuaddr
 
@@ -89,6 +89,17 @@ impl Ppu {
             self.ppuctrl = val;
         } else if addr == 0x2001 {
             self.ppumask = val;
+        } else if addr == 0x2005 {
+            if !self.w {
+                self.t = self.t & !0x001F | (val as u16) >> 3;
+                self.x = val & 0b111;
+                self.w = true;
+            } else {
+                self.t = self.t & !0x73E0
+                        | ((val as u16) & 0x07) << 12
+                        | ((val as u16) & 0xF8) << 2;
+                self.w = false;
+            }
         } else if addr == 0x2006 {
             if !self.w {
                 self.t = self.t & 0x00FF | ((val as u16)<< 8);
