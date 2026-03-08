@@ -6,6 +6,12 @@ pub struct Ppu {
     ppuctrl: u8, // tempat CPU mengatur PPU
     ppumask: u8, // tempat CPU mengatur setting visual
     ppustatus: u8, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
+    ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
+    v: u16,
+    t: u16,
+    x: u16,
+    w: bool, // write toggle untuk menentukan cpu lagi nulis hi byte atau lo byte
+                   // ke ppuaddr
 
     scanlines: u16, // letak titik yang sedang di render secara vertikal
     cycles: u16, // letak titik yang sedan di render secara horizontal
@@ -21,11 +27,15 @@ pub struct Ppu {
 impl fmt::Debug for Ppu {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Ppu")
-        .field("ppuctrl", &format_args!("{:08b} [{}] [${:x}]", self.ppuctrl, self.ppuctrl, self.ppuctrl))
-        .field("ppumask", &format_args!("{:08b} [{}] [${:x}]", self.ppumask, self.ppumask, self.ppumask))
-        .field("ppustatus", &format_args!("{:08b} [{}] [${:x}]", self.ppustatus, self.ppustatus, self.ppustatus))
-        .field("scanlines", &format_args!("{:08b} [{}] [${:x}]", self.scanlines, self.scanlines, self.scanlines))
-        .field("cycles", &format_args!("{:08b} [{}] [${:x}]", self.cycles, self.cycles, self.cycles))
+        .field("ppuctrl", &format!("{:08b} [{}] [${:x}]", self.ppuctrl, self.ppuctrl, self.ppuctrl))
+        .field("ppumask", &format!("{:08b} [{}] [${:x}]", self.ppumask, self.ppumask, self.ppumask))
+        .field("ppustatus", &format!("{:08b} [{}] [${:x}]", self.ppustatus, self.ppustatus, self.ppustatus))
+        .field("v", &format!("{:08b} [{}] [${:x}]", self.v, self.v, self.v))
+        .field("t", &format!("{:08b} [{}] [${:x}]", self.t, self.t, self.t))
+        .field("x", &format!("{:08b} [{}] [${:x}]", self.x, self.x, self.x))
+        .field("w", &format!("{}", self.w))
+        .field("scanlines", &format!("{:08b} [{}] [${:x}]", self.scanlines, self.scanlines, self.scanlines))
+        .field("cycles", &format!("{:08b} [{}] [${:x}]", self.cycles, self.cycles, self.cycles))
         .finish()
     }
 }
@@ -36,6 +46,11 @@ impl Ppu {
             ppuctrl: 0,
             ppumask: 0,
             ppustatus: 0,
+            ppuaddr: 0,
+            v: 0,
+            t: 0,
+            x: 0,
+            w: false,
             scanlines: 0,
             cycles: 0,
             frame_rendered: 0,
@@ -72,6 +87,17 @@ impl Ppu {
     pub fn handle_write(&mut self, addr: u16, val: u8) {
         if addr == 0x2000 {
             self.ppuctrl = val;
+        } else if addr == 0x2001 {
+            self.ppumask = val;
+        } else if addr == 0x2006 {
+            if !self.w {
+                self.t = self.t & 0x00FF | ((val as u16)<< 8);
+                self.w = true;
+            } else {
+                self.t = self.t & 0xFF00 | val as u16;
+                self.v = self.t;
+                self.w = false;
+            }
         }
     }
 
