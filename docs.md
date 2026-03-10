@@ -112,10 +112,65 @@ Struktur Hardware NES :
           mana di dalam OAM yang ingin diakses. Diakses oleh CPU dengan menulis ke address 0x2003
         - OAMDATA (Read / Write)
         - PPUSCROLL (Write Only - Twice)
-          Register ini yang membuat game NES bisa scrolling (berjalan ke samping atau keatas)
+          Register ini yang membuat game NES bisa scrolling (berjalan ke samping atau keatas). 
+          Berikut adalah format data yang dikirim dari CPU ke PPUSCROLL : 
+          
+          Data pertama :
+          76543 210
+          ||||| |||
+          ||||| +++  fine X
+          +++++      coarse X
+          
+          Data kedua   : 
+          76543 210
+          ||||| |||
+          ||||| +++  fine Y
+          +++++      coarse Y
+          
+          Nantinya data fine dan coarse ini akan digunakan untuk menset bit yang sesuai di 
+          register t dan register x
         - PPUADDR (Write Only - Twice)
-          Untuk menentukan alamat vram mana yang ingin diisi data. Karena Memori PPU (Vram) itu 16 bit, tapi jalu dari cpu cuma 8 bit, cpu harus menulis 2 kali ke register ini
+          Untuk menentukan alamat vram mana yang ingin diisi data. Karena Memori PPU (Vram) itu 16 bit, tapi jalur dari cpu cuma 8 bit, cpu harus menulis 2 kali ke register ini.
+          Berikut adalah data yang dikirim ke PPUADDR :
+          
+          yyy NN YYYYY XXXXX
+          ||| || ||||| +++++-- coarse X
+          ||| || +++++-------- coarse Y
+          ||| ++-------------- nametable
+          +++----------------- fine Y
+          
+          Totalnya 15 bit, nah data ini dikirim dalam 2 batch, batch pertama mengirim high byte nya.
+          Yang kedua mengirim low byte nya
         - PPUDATA
+    Disamping register di atas, PPU juga punya beberapa internal register : 
+        - v
+          Vram address aktif. Value dari register T nantinya akan disimpan disini, kemudian ppu akan
+          me render gambar dari sini
+        - t
+          temporary vram adddress, berikut adalah struktur dari register t :
+            yyy NN YYYYY XXXXX
+            ||| || ||||| +++++-- coarse X (5 bit)
+            ||| || +++++-------- coarse Y (5 bit)
+            ||| ++-------------- nametable select (2 bit)
+            +++----------------- fine Y (3 bit)
+          5 bit pertama (coarse X) digunakan untuk mengetahui poisisi tile secara horizontal
+          5 bit berikutnya (coarse Y) digunakan untuk mengetahuui posisi tile secara vertikal
+          2 bit berikutnya (nametable select) digunakan untuk memilih nametable
+          3 bit berikutnya (fine Y) digunakan untuk mengetahui offset pixel dalam tile
+          
+          totalnya sebenarnya hanya 15 bit, namun di emulator bisa kita implementasikan pakai u16
+          
+        - x
+          fine X scroll. Digunakan untuk menentukan offset pixel horizontal di dalam tile. ukuran
+          sebenarnya hanya 3 bit (sama seperti fine Y), namun di emulator bisa kita simulasikan pakai
+          u8
+        - w
+          write toggle. Digunakan untuk menentukan apakah write berikutnya adalah write pertama atau
+          write kedua. Kita butuh register ini karena data yang bisa di tulis melalui bus dari CPU ke
+          PPU hanyalah 8 bit, sedangkan untuk menulis informasi yang diperlukan ke register T, kita 
+          perlu 15 bit, jadi kirimnya harus satu satu, kirim 8 bit pertama dan 8 bit kedua. Nah 
+          register ini perlu agar ppu tahu, mana 8 bit yang low bit mana 8 bit yang high bit agar 
+          kedua data tersebut bisa digabung jadi satu di register T
     PPU punya 2 counter untuk nge track titik lokasi yang dirender : 
         - Scanline : ini adalah counter untuk nge track lokasi titik secara vertikal. Ada total 262 scanline per frame untuk game dengan format NTSC, dan 312 scanline per frame untuk game 
                      dengan format PAL. Detail scanlinenya adalah sebagai berikut : 
