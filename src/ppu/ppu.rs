@@ -1,10 +1,10 @@
 use std::fmt;
 
-use crate::{mochanes::Region, ppu::registers::ppuctrl::PpuCtrl};
+use crate::{mochanes::Region, ppu::registers::{ppuctrl::PpuCtrl, ppumask::PpuMask}};
 
 pub struct Ppu {
     ctrl: PpuCtrl, // tempat CPU mengatur PPU
-    ppumask: u8, // tempat CPU mengatur setting visual
+    mask: PpuMask, // tempat CPU mengatur setting visual
     ppustatus: u8, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
     ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
     v: u16,
@@ -30,7 +30,7 @@ impl fmt::Debug for Ppu {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Ppu")
         .field("ctrl", &format!("{:08b} [{}] [${:x}]", self.ctrl.bits(), self.ctrl.bits(), self.ctrl.bits()))
-        .field("ppumask", &format!("{:08b} [{}] [${:x}]", self.ppumask, self.ppumask, self.ppumask))
+        .field("ppumask", &format!("{:08b} [{}] [${:x}]", self.mask.bits(), self.mask.bits(), self.mask.bits()))
         .field("ppustatus", &format!("{:08b} [{}] [${:x}]", self.ppustatus, self.ppustatus, self.ppustatus))
         .field("v", &format!("{:08b} [{}] [${:x}]", self.v, self.v, self.v))
         .field("t", &format!("{:08b} [{}] [${:x}]", self.t, self.t, self.t))
@@ -46,7 +46,7 @@ impl Ppu {
     pub fn new() -> Self {
         Ppu {
             ctrl: PpuCtrl::from_bits_truncate(0),
-            ppumask: 0,
+            mask: PpuMask::from_bits_truncate(0),
             ppustatus: 0,
             ppuaddr: 0,
             v: 0,
@@ -91,7 +91,7 @@ impl Ppu {
         if addr == 0x2000 {
             self.ctrl = PpuCtrl::from_bits_truncate(val);
         } else if addr == 0x2001 {
-            self.ppumask = val;
+            self.mask = PpuMask::from_bits_truncate(val);
         } else if addr == 0x2005 {
             if !self.w {
                 self.t = self.t & !0x001F | (val as u16) >> 3;
