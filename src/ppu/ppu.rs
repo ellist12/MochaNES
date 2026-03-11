@@ -1,9 +1,9 @@
 use std::fmt;
 
-use crate::mochanes::Region;
+use crate::{mochanes::Region, ppu::registers::ppuctrl::PpuCtrl};
 
 pub struct Ppu {
-    ppuctrl: u8, // tempat CPU mengatur PPU
+    ctrl: PpuCtrl, // tempat CPU mengatur PPU
     ppumask: u8, // tempat CPU mengatur setting visual
     ppustatus: u8, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
     ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
@@ -29,7 +29,7 @@ pub struct Ppu {
 impl fmt::Debug for Ppu {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Ppu")
-        .field("ppuctrl", &format!("{:08b} [{}] [${:x}]", self.ppuctrl, self.ppuctrl, self.ppuctrl))
+        .field("ctrl", &format!("{:08b} [{}] [${:x}]", self.ctrl.bits(), self.ctrl.bits(), self.ctrl.bits()))
         .field("ppumask", &format!("{:08b} [{}] [${:x}]", self.ppumask, self.ppumask, self.ppumask))
         .field("ppustatus", &format!("{:08b} [{}] [${:x}]", self.ppustatus, self.ppustatus, self.ppustatus))
         .field("v", &format!("{:08b} [{}] [${:x}]", self.v, self.v, self.v))
@@ -45,7 +45,7 @@ impl fmt::Debug for Ppu {
 impl Ppu {
     pub fn new() -> Self {
         Ppu {
-            ppuctrl: 0,
+            ctrl: PpuCtrl::from_bits_truncate(0),
             ppumask: 0,
             ppustatus: 0,
             ppuaddr: 0,
@@ -89,7 +89,7 @@ impl Ppu {
 
     pub fn handle_write(&mut self, addr: u16, val: u8) {
         if addr == 0x2000 {
-            self.ppuctrl = val;
+            self.ctrl = PpuCtrl::from_bits_truncate(val);
         } else if addr == 0x2001 {
             self.ppumask = val;
         } else if addr == 0x2005 {
@@ -117,7 +117,7 @@ impl Ppu {
 
             // setelah write ke address yang di set, increment v dengan + 1 / +32,
             // sesuai dengan bit ke 2 dari PPUCTRL
-            if self.ppuctrl & 0b100 != 0 {
+            if self.ctrl.contains(PpuCtrl::INCREMENT_MODE) {
                 self.v += 32;
             } else {
                 self.v += 1;

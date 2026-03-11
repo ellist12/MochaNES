@@ -1,4 +1,4 @@
-use crate::{cartridge::Cartridge, mochanes::Region, ppu::Ppu};
+use crate::{cartridge::Cartridge, mochanes::Region, ppu::ppu::Ppu, };
 
 pub struct Bus {
     //ram
