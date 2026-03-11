@@ -13,6 +13,8 @@ pub struct Ppu {
     w: bool, // write toggle untuk menentukan cpu lagi nulis hi byte atau lo byte
                    // ke ppuaddr
 
+    vram: [u8; 2048],
+
     scanlines: u16, // letak titik yang sedang di render secara vertikal
     cycles: u16, // letak titik yang sedan di render secara horizontal
     frame_rendered: u8, // total frame yang sudah di render
@@ -51,6 +53,7 @@ impl Ppu {
             t: 0,
             x: 0,
             w: false,
+            vram: [0; 2048],
             scanlines: 0,
             cycles: 0,
             frame_rendered: 0,
@@ -109,6 +112,16 @@ impl Ppu {
                 self.v = self.t;
                 self.w = false;
             }
+        } else if addr == 0x2007 {
+            self.ppu_write(self.v, val);
+
+            // setelah write ke address yang di set, increment v dengan + 1 / +32,
+            // sesuai dengan bit ke 2 dari PPUCTRL
+            if self.ppuctrl & 0b100 != 0 {
+                self.v += 32;
+            } else {
+                self.v += 1;
+            }
         }
     }
 
@@ -118,6 +131,25 @@ impl Ppu {
         } else {
             println!("PPU address {} not implemented", addr);
             0
+        }
+    }
+
+    pub fn ppu_write(&mut self, addr: u16, val: u8) {
+        match addr {
+            0x0000..0x1FFF => {
+                // Tulis ke pattern table di cartridge.
+                // instruksi ini hanya bisa bekerja saat cartridgenya pakai CHR RAM bukan CHR ROM
+            }
+            0x2000..0x2FFF => {
+                // Tulis ke nametable
+            }
+            0x3000..0x3EFF => {
+                // Tulis ke nametable (Mirror)
+            }
+            0x3F00..0x3FFF => {
+                // Tulis ke pallete ram
+            }
+            _ => todo!()
         }
     }
 

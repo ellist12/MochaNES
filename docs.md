@@ -142,9 +142,11 @@ Struktur Hardware NES :
           Totalnya 15 bit, nah data ini dikirim dalam 2 batch, batch pertama mengirim high byte nya.
           Yang kedua mengirim low byte nya
         - PPUDATA
+          Tempat CPU menulis / membaca data dari vram yang ditunjuk oleh alamat di register v, yang 
+          sudah di set melalui PPUADDR
     Disamping register di atas, PPU juga punya beberapa internal register : 
         - v
-          Vram address aktif. Value dari register T nantinya akan disimpan disini, kemudian ppu akan
+          Current Vram address aktif. Value dari register T nantinya akan disimpan disini, kemudian ppu akan
           me render gambar dari sini
         - t
           temporary vram adddress, berikut adalah struktur dari register t :
@@ -171,6 +173,7 @@ Struktur Hardware NES :
           perlu 15 bit, jadi kirimnya harus satu satu, kirim 8 bit pertama dan 8 bit kedua. Nah 
           register ini perlu agar ppu tahu, mana 8 bit yang low bit mana 8 bit yang high bit agar 
           kedua data tersebut bisa digabung jadi satu di register T
+    Selain register - register tersebut, PPU juga punya vram yang berukuran 2KB (2048 byte).
     PPU punya 2 counter untuk nge track titik lokasi yang dirender : 
         - Scanline : ini adalah counter untuk nge track lokasi titik secara vertikal. Ada total 262 scanline per frame untuk game dengan format NTSC, dan 312 scanline per frame untuk game 
                      dengan format PAL. Detail scanlinenya adalah sebagai berikut : 
@@ -190,6 +193,11 @@ Struktur Hardware NES :
                         - Cycle 2 - 257      : PPU Mengambil data tile dari VRAM dan menggambar 256 pixel ke layar
                         - Cycle 258 - 320    : PPU Mengambil data untuk fase berikutnya (pre-fetching)
                         - Cycle 321 - 340    : H-Blank, PPU Beristirahat dan memindahkan posisi "pensil" kembali ke kiri
+    PPU juga punya address space atau rentang address yang bisa diakses, yaitu dari 0x0000 - 0x3FFF (16KB). Isi dari address space PPU ini ialah : 
+        - 0x0000 - 0x1FFF  :   Pattern table (CHR ROM / CHR RAM)
+        - 0x2000 - 0x2FFF  :   Nametable 
+        - 0x3000 - 0x3EFF  :   Mirror dari nametable 
+        - 0x3F00 - 0x3FFF  :   Palette RAM
 
 ## Opcode : 
     Opcode adalah instruksi yang bentuknya binary, dan bisa dipahami oleh CPU dari NES.
