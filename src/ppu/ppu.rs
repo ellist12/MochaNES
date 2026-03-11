@@ -1,11 +1,11 @@
 use std::fmt;
 
-use crate::{mochanes::Region, ppu::registers::{ppuctrl::PpuCtrl, ppumask::PpuMask}};
+use crate::{mochanes::Region, ppu::registers::{ppuctrl::PpuCtrl, ppumask::PpuMask, ppustatus::PpuStatus}};
 
 pub struct Ppu {
     ctrl: PpuCtrl, // tempat CPU mengatur PPU
     mask: PpuMask, // tempat CPU mengatur setting visual
-    ppustatus: u8, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
+    status: PpuStatus, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
     ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
     v: u16,
     t: u16,
@@ -30,8 +30,8 @@ impl fmt::Debug for Ppu {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Ppu")
         .field("ctrl", &format!("{:08b} [{}] [${:x}]", self.ctrl.bits(), self.ctrl.bits(), self.ctrl.bits()))
-        .field("ppumask", &format!("{:08b} [{}] [${:x}]", self.mask.bits(), self.mask.bits(), self.mask.bits()))
-        .field("ppustatus", &format!("{:08b} [{}] [${:x}]", self.ppustatus, self.ppustatus, self.ppustatus))
+        .field("mask", &format!("{:08b} [{}] [${:x}]", self.mask.bits(), self.mask.bits(), self.mask.bits()))
+        .field("status", &format!("{:08b} [{}] [${:x}]", self.status.bits(), self.status.bits(), self.status.bits()))
         .field("v", &format!("{:08b} [{}] [${:x}]", self.v, self.v, self.v))
         .field("t", &format!("{:08b} [{}] [${:x}]", self.t, self.t, self.t))
         .field("x", &format!("{:08b} [{}] [${:x}]", self.x, self.x, self.x))
@@ -47,7 +47,7 @@ impl Ppu {
         Ppu {
             ctrl: PpuCtrl::from_bits_truncate(0),
             mask: PpuMask::from_bits_truncate(0),
-            ppustatus: 0,
+            status: PpuStatus::from_bits_truncate(0),
             ppuaddr: 0,
             v: 0,
             t: 0,
@@ -79,9 +79,9 @@ impl Ppu {
             self.cycles += 1;
             return;
         } else if self.scanlines >= 241 && self.scanlines <= self.v_blank_limit && self.cycles == 0 {
-            self.ppustatus = self.ppustatus | 0b10000000;
+            self.status.insert(PpuStatus::V_BLANK);
         } else if self.scanlines == self.pre_render_scanline && self.cycles == 0 {
-            self.ppustatus = self.ppustatus & 0b01111111;
+            self.status.remove(PpuStatus::V_BLANK);
         }
 
         self.cycles += 1;
@@ -127,7 +127,7 @@ impl Ppu {
 
     pub fn handle_read(&self, addr: u16) -> u8 {
         if addr == 0x2002 {
-            self.ppustatus
+            self.status.bits()
         } else {
             println!("PPU address {} not implemented", addr);
             0
