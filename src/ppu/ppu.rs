@@ -47,7 +47,6 @@ impl Ppu {
             ctrl: PpuCtrl::from_bits_truncate(0),
             mask: PpuMask::from_bits_truncate(0),
             status: PpuStatus::from_bits_truncate(0),
-            ppuaddr: 0,
             v: 0,
             t: 0,
             x: 0,
