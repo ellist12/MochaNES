@@ -6,7 +6,6 @@ pub struct Ppu {
     ctrl: PpuCtrl, // tempat CPU mengatur PPU
     mask: PpuMask, // tempat CPU mengatur setting visual
     status: PpuStatus, // tempat PPU menuliskan statusnya yang kemudian akan dibaca oleh CPU
-    ppuaddr: u16, // tempat CPU menuliskan alamat ram yang ingin di read / write
     v: u16,
     t: u16,
     x: u8,
