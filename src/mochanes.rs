@@ -1,6 +1,7 @@
 use std::{fs::File};
 use std::io::Read;
 
+use crate::cartridge::Mirroring;
 use crate::cpu::cpu::Cpu;
 use crate::{bus::Bus, cartridge::Cartridge};
 
@@ -61,6 +62,11 @@ impl MochaNES {
             println!("ada trainer");
         }
 
+        let mut mirroring = Mirroring::Horizontal; // Set default mirroring ke horizontal
+        if (header[6] & 0b00000001) != 0 {
+            mirroring = Mirroring::Vertical;
+        }
+
         //3. Baca ukuran cartridge program dengan membaca header byte ke 4
         //   angka di byte 4 header nanti akan kita kalikan dengan 16KB untuk mengetahui ukurannya
         let prg_banks = header[4];
@@ -93,7 +99,7 @@ impl MochaNES {
         let mut chr_rom = vec![0u8; chr_size];
         file.read_exact(&mut chr_rom).expect("Gagal membaca CHR-ROM");
 
-        let cartridge = Cartridge::new(prg_rom, chr_rom);
+        let cartridge = Cartridge::new(prg_rom, chr_rom, mirroring);
 
         self.bus.set_cartridge(cartridge);
     }

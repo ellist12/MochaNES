@@ -1,12 +1,19 @@
+pub enum Mirroring {
+    Vertical,
+    Horizontal
+}
+
 pub struct Cartridge {
     pub prg_rom: Vec<u8>,
     // current_prg_rom_bank: u8,
-    pub chr_rom: Vec<u8>
+    pub chr_rom: Vec<u8>,
+
+    mirroring: Mirroring
 }
 
 impl Cartridge {
-    pub fn new(prg_rom: Vec<u8>, chr_rom: Vec<u8>) -> Self {
-        Cartridge { prg_rom, chr_rom}
+    pub fn new(prg_rom: Vec<u8>, chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
+        Cartridge { prg_rom, chr_rom, mirroring}
     }
 
     pub fn read_prg(&mut self, addr: u16) -> u8 {
