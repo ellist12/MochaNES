@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{mochanes::Region, ppu::registers::{ppuctrl::PpuCtrl, ppumask::PpuMask, ppustatus::PpuStatus}};
+use crate::{cartridge::{Cartridge, Mirroring}, mochanes::Region, ppu::registers::{ppuctrl::PpuCtrl, ppumask::PpuMask, ppustatus::PpuStatus}};
 
 pub struct Ppu {
     ctrl: PpuCtrl, // tempat CPU mengatur PPU
@@ -85,7 +85,7 @@ impl Ppu {
         self.cycles += 1;
     }
 
-    pub fn handle_write(&mut self, addr: u16, val: u8) {
+    pub fn handle_write(&mut self, addr: u16, val: u8, cartridge: &Cartridge) {
         if addr == 0x2000 {
             self.ctrl = PpuCtrl::from_bits_truncate(val);
         } else if addr == 0x2001 {
@@ -111,7 +111,7 @@ impl Ppu {
                 self.w = false;
             }
         } else if addr == 0x2007 {
-            self.ppu_write(self.v, val);
+            self.ppu_write(self.v, val, cartridge);
 
             // setelah write ke address yang di set, increment v dengan + 1 / +32,
             // sesuai dengan bit ke 2 dari PPUCTRL
@@ -132,7 +132,7 @@ impl Ppu {
         }
     }
 
-    pub fn ppu_write(&mut self, addr: u16, val: u8) {
+    pub fn ppu_write(&mut self, addr: u16, val: u8, cartridge: &Cartridge) {
         match addr {
             0x0000..0x1FFF => {
                 // Tulis ke pattern table di cartridge.
@@ -140,6 +140,23 @@ impl Ppu {
             }
             0x2000..0x2FFF => {
                 // Tulis ke nametable
+                // 0x2001 -> 0x0001
+                let offset = addr - 0x2000;
+                let nametable_offset = offset / 0x400;
+                let mirroring = cartridge.mirroring;
+                if mirroring == Mirroring::Vertical {
+                    if nametable_offset == 0 || nametable_offset == 2 {
+                        self.vram[offset as usize % 0x400] = val;
+                    } else {
+                        self.vram[offset as usize % 0x400 + 1024] = val;
+                    }
+                } else {
+                    if nametable_offset == 0 || nametable_offset == 1 {
+                        self.vram[offset as usize % 0x400] = val;
+                    } else {
+                        self.vram[offset as usize % 0x400 + 1024] = val;
+                    }
+                }
             }
             0x3000..0x3EFF => {
                 // Tulis ke nametable (Mirror)

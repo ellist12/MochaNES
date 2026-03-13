@@ -1,3 +1,4 @@
+#[derive(Clone, Copy, PartialEq)]
 pub enum Mirroring {
     Vertical,
     Horizontal
@@ -8,7 +9,7 @@ pub struct Cartridge {
     // current_prg_rom_bank: u8,
     pub chr_rom: Vec<u8>,
 
-    mirroring: Mirroring
+    pub mirroring: Mirroring
 }
 
 impl Cartridge {
