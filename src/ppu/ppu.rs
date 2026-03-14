@@ -140,9 +140,11 @@ impl Ppu {
             }
             0x2000..0x2FFF => {
                 // Tulis ke nametable
-                // 0x2001 -> 0x0001
+                // 0010 NNYY YYYX XXXX
+                //      ||
+                //      Nametable select
                 let offset = addr - 0x2000;
-                let nametable_offset = offset / 0x400;
+                let nametable_offset = (addr >> 10) & 0x3;
                 let mirroring = cartridge.mirroring;
                 if mirroring == Mirroring::Vertical {
                     if nametable_offset == 0 || nametable_offset == 2 {
@@ -160,6 +162,22 @@ impl Ppu {
             }
             0x3000..0x3EFF => {
                 // Tulis ke nametable (Mirror)
+                let offset = addr - 0x3000;
+                let nametable_offset = offset / 0x400;
+                let mirroring = cartridge.mirroring;
+                if mirroring == Mirroring::Vertical {
+                    if nametable_offset == 0 || nametable_offset == 2 {
+                        self.vram[offset as usize % 0x400] = val;
+                    } else {
+                        self.vram[offset as usize % 0x400 + 1024] = val;
+                    }
+                } else {
+                    if nametable_offset == 0 || nametable_offset == 1 {
+                        self.vram[offset as usize % 0x400] = val;
+                    } else {
+                        self.vram[offset as usize % 0x400 + 1024] = val;
+                    }
+                }
             }
             0x3F00..0x3FFF => {
                 // Tulis ke pallete ram

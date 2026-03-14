@@ -381,6 +381,20 @@ Struktur Hardware NES :
     - Byte 1 : Index Tile (Gambar apa yang diambil dari bank karakter).
     - Byte 2 : Atribut (warna, prioritas, apakah gambarnya dibalik secara horizontal / vertikal)
     - Byte 3 : Posisi X (Kiri / Kanan)
-    file:///home/mochamocha/Downloads/Donkey Kong (JU) %5BT-Span%5D.nes
+
+#### Pattern Table
+  Pattern table adalah memori berisi data tile grafis. Nah pattern table ini bisa diakses oleh ppu melalui address space : 
+      - 0x0000 - 0x0FFF -> Untuk pattern table 0
+      - 0x1000 - 0x1FFF -> Untuk pattern table 1
+  
+  Biasanya pattern table ini disimpan di CHR ROM atau CHR RAM.
+  
+  Nah pattern table ini digunakan untuk menyimpan data tile grafis, 1 tile grafis menyimpan 8x8 pixel yang berukuran 16 byte. Setiap pixel direprensentasikan dengan bilangan 2 bit yang
+  menentukan warna yang dipakai di color pallete. Misal : 
+      - 00 : warna1
+      - 01 : warna2
+      - 10 : warna3
+      - 11 : warna4
+  Karena ada 8 x 8 pixel, maka jumlah bit yang harus dibaca adalah 8 x 8 = 64 pixel x 2 bit = 128 bit / 8 = 16 byte
     
   
