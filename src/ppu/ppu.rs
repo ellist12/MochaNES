@@ -64,6 +64,8 @@ impl Ppu {
     }
 
     pub fn tick(&mut self) {
+        self.cycles += 1;
+
         if self.cycles >= self.cycles_limit {
             self.cycles = 0;
             self.scanlines += 1;
@@ -73,16 +75,13 @@ impl Ppu {
         }
 
 
-        if self.scanlines == 240 {
-            self.cycles += 1;
-            return;
-        } else if self.scanlines >= 241 && self.scanlines <= self.v_blank_limit && self.cycles == 0 {
+        if self.scanlines == 241 && self.cycles == 1 {
             self.status.insert(PpuStatus::V_BLANK);
-        } else if self.scanlines == self.pre_render_scanline && self.cycles == 0 {
+        } else if self.scanlines == self.pre_render_scanline && self.cycles == 1 {
             self.status.remove(PpuStatus::V_BLANK);
+            self.status.remove(PpuStatus::SPRITE_0_HIT);
         }
 
-        self.cycles += 1;
     }
 
     pub fn handle_write(&mut self, addr: u16, val: u8, cartridge: &Cartridge) {
@@ -134,11 +133,11 @@ impl Ppu {
 
     pub fn ppu_write(&mut self, addr: u16, val: u8, cartridge: &Cartridge) {
         match addr {
-            0x0000..0x1FFF => {
+            0x0000..=0x1FFF => {
                 // Tulis ke pattern table di cartridge.
                 // instruksi ini hanya bisa bekerja saat cartridgenya pakai CHR RAM bukan CHR ROM
             }
-            0x2000..0x2FFF => {
+            0x2000..=0x2FFF => {
                 // Tulis ke nametable
                 // 0010 NNYY YYYX XXXX
                 //      ||
@@ -160,7 +159,7 @@ impl Ppu {
                     }
                 }
             }
-            0x3000..0x3EFF => {
+            0x3000..=0x3EFF => {
                 // Tulis ke nametable (Mirror)
                 let offset = addr - 0x3000;
                 let nametable_offset = offset / 0x400;
@@ -179,8 +178,30 @@ impl Ppu {
                     }
                 }
             }
-            0x3F00..0x3FFF => {
+            0x3F00..=0x3FFF => {
                 // Tulis ke pallete ram
+            }
+            _ => todo!()
+        }
+    }
+
+    pub fn ppu_read(&mut self, addr: u16, cartridge: &Cartridge) -> u8 {
+        match addr {
+            0x0000..=0x1FFF => {
+                cartridge.chr_rom[addr as usize]
+            }
+            0x2000..=0x2FFF => {
+                let offset = addr - 0x2000;
+                let offset = offset % 0x800;
+                self.vram[offset as usize]
+            }
+            0x3000..=0x3EFF => {
+                let offset = addr - 0x2000;
+                let offset = offset % 0x800;
+                self.vram[offset as usize]
+            }
+            0x3F00..=0x3FFF => {
+                0
             }
             _ => todo!()
         }
